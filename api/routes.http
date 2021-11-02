@@ -1,0 +1,23 @@
+
+#########################################
+#              API - ROUTES             #
+#########################################
+
+@HOST = 165.22.218.192
+@PORT = 4006
+@TO  = 8459953212
+
+
+###Send Message
+GET http://{{HOST}}:{{PORT}}/api HTTP/1.1
+
+
+###Send Message
+POST http://{{HOST}}:{{PORT}}/api/send/message HTTP/1.1
+accept: * 
+content-type: application/json
+
+{
+    "phone": {{TO}},
+    "message": "HEY, JUST CHECKING ROUTE"
+}

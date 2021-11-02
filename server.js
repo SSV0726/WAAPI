@@ -1,35 +1,57 @@
-const express = require("express");
-const morgan = require("morgan");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-require("dotenv").config();
+"use strict"
 
-// app
+const cors        = require("cors");
+const path        = require("path");
+const morgan      = require("morgan");
+const express     = require("express");
+const bodyParser  = require("body-parser");
+const { send }    = require('./wweb/sendMessage');
+const dotenv      = require("dotenv").config({ path : path.join( __dirname  , ".env") });
+
+
 const app = express();
-
-const { send } = require('./sendMessage');
-
-// routes middleware
 app.use(morgan("dev"));
-app.use(bodyParser.json({ limit: "2mb" }));
 app.use(cors());
 
 
-
-// routes
-app.get("/test", (req, res) => {
+//##################################################//
+//                    Routes                        //
+//##################################################//
+app.get("/", (req, res) => {
   res.json({
-    state: "successfull",
+    status  : "success",
+    message : "API is working !!",
   });
 });
 
-app.post('/send/message',(req,res)=> {
-    send(req.body.phone,req.body.message);
-    console.log("Body",req.body);
+app.get("/api", (req, res) => {
+  res.json({
+    status  : "success",
+    message : "API is working !!",
+  });
 });
 
-// Start SERVER on PORT
-const PORT = 8000;
+
+app.post('/api/send/message',(req,res)=> {
+  try{
+
+    send(req.body.phone,req.body.message);
+    console.log("Body",req.body);
+
+  }catch(err){
+    res.json({ 
+      status  : "error",
+      message : err 
+    });
+  }
+   
+});
+
+
+//##################################################//
+//                    SERVER                        //
+//##################################################//
+const PORT = process.env.PORT || 4006;
 app.listen(PORT, (err) => {
   if (err) {
     console.error(`ERROR While Starting Server : ${err}`);
