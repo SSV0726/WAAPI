@@ -8,8 +8,18 @@
 @TO  = 8459953212
 
 
-###Send Message
+### Check if API is working 
 GET http://{{HOST}}:{{PORT}}/api HTTP/1.1
+
+### Get QR-CODE to login 
+GET http://{{HOST}}:{{PORT}}/api/qrcode HTTP/1.1
+accept: * 
+content-type: application/json
+
+### Check Client status if its logged in or not
+GET http://{{HOST}}:{{PORT}}/api/whatsapp/status HTTP/1.1
+accept: * 
+content-type: application/json
 
 
 ###Send Message
@@ -21,3 +31,5 @@ content-type: application/json
     "phone": {{TO}},
     "message": "HEY, JUST CHECKING ROUTE"
 }
+
+

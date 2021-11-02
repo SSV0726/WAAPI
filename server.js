@@ -5,7 +5,7 @@ const path        = require("path");
 const morgan      = require("morgan");
 const express     = require("express");
 const bodyParser  = require("body-parser");
-const { send }    = require('./wweb/sendMessage');
+const whatsapp    = require('./whatsapp');
 const dotenv      = require("dotenv").config({ path : path.join( __dirname  , ".env") });
 
 
@@ -31,6 +31,21 @@ app.get("/api", (req, res) => {
   });
 });
 
+app.get("/api/qrcode", (req, res) => {
+  res.json({
+    status  : "success",
+    data    :  whatsapp.getQRcode(),
+    url     : "https://4qrcode.com/#text",
+  });
+});
+
+app.get("/api/whatsapp/status", (req, res) => {
+  res.json({
+    status  : "success",
+    data    :  whatsapp.getClientStatus(),
+    url     : "https://4qrcode.com/#text",
+  });
+});
 
 app.post('/api/send/message',(req,res)=> {
   try{
