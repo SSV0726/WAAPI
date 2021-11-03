@@ -30,8 +30,7 @@ client.on('message', message => {
     let msgRecieved = message.body.toLocaleLowerCase();
     if( replies[msgRecieved] != undefined ){
         message.reply(replies[msgRecieved]);
-    }   
-    
+    }  
 });
 
 client.initialize();
@@ -44,13 +43,13 @@ function sendMessage(mobile,message){
 
     // we have to delete "+" from the beginning and add "@c.us" at the end of the number.
     if( isNaN(parseInt(mobile[0])) ){
-        mobile = mobile.substring(1) +  "@c.us";
+        mobile = "91" + mobile +  "@c.us";
     }else{
         mobile = mobile + "@c.us";
     }
+    console.log("sendMessage(",mobile,message,")");
 
     let chatId = mobile;   // chatID is used for sending messages
-    console.log("sendMessage(",mobile,message,")");
     
     return new Promise((resolve,reject)=>{
          // Sending message.

@@ -5,7 +5,7 @@
 
 @HOST = 165.22.218.192
 @PORT = 4006
-@TO  = 8459953212
+@TO  = 9372220540
 
 
 ### Check if API is working 
@@ -29,7 +29,7 @@ content-type: application/json
 
 {
     "phone": {{TO}},
-    "message": "HEY, JUST CHECKING ROUTE"
+    "message": "HEY, JUST CHECKING ROUTE ASAP!"
 }
 
 

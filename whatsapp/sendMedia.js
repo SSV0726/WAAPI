@@ -1,38 +1,55 @@
-const { Client } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
+const axios = require('axios');
+const { Buffer } = require('buffer');
+const { Client , MessageMedia} = require('whatsapp-web.js');
 const client = new Client();
+var request = require('request').defaults({ encoding: null });
 
-// Get QR code to scan WhatsAPP
+
 client.on('qr', qr => {
     qrcode.generate(qr, {small: true});
 });
 
-function send(phone,message){
- console.log("This is in function!");
- var media = await new MessageMedia("image/jpg", _base64.data, "myimage.jpg")
-
-  // Getting chatId from the number.
-  // we have to delete "+" from the beginning and add "@c.us" at the end of the number.
- const chatId = "91" + phone + "@c.us";
-
- console.log("parrams",phone,chatId,message);
-
- // Sending message.
- client.isRegisteredUser(chatId).then(function(isRegistered) {
-    if(isRegistered) {
-        client.sendMessage(chatId, message);
-    }
- })  
-}
-
-// function loop(){
-//     setInterval(send, 3000);
+// async function getBase64(url) {
+//     return Buffer.from(
+//       (await axios.get(url, {
+//         responseType: 'arraybuffer'
+//       })).data, 'binary').toString('base64');
 // }
 
-client.on('ready', () => {
- console.log('Client is ready!');
-  send();
- });
+async function send(chatId){
+    // const response = await axios.get('https://picsum.photos/seed/picsum/200/300', {
+    //     responseType: "arraybuffer"
+    //   });
+    // var media = await MessageMedia(('image/webp',Buffer.from(response).data,'binary').toString('base64'));
+    // console.log("media",media);
 
+
+   
+
+    // const response = await axios.get('https://picsum.photos/seed/picsum/200/300');
+    // const buffer = await response.buffer()
+
+    imageToBase64('https://picsum.photos/200/300') // Image URL
+        .then( async (response2) => {
+           const media = new MessageMedia('jpeg', response2);
+           var response = await client.sendMessage(chatId, media, {caption: 'new image'});
+           console.log('rres',response);
+         })
+
+    // const url = "https://picsum.photos/seed/picsum/200/300";
+    // const image = await axios.get(url, {responseType: 'arraybuffer'});
+    // const raw = Buffer.from(image.data).toString('base64');
+    // const base64Image = "data:" + image.headers["content-type"] + ";base64,"+raw;
+
+    // var text = 'this is a bot text';
+    // console.log("log", chatId);
+    
+}
+
+client.on('ready', () => {
+    console.log('Client is ready!');
+    send('919372220540@c.us');
+});
+	
 client.initialize();
-module.exports['send'] = send;
