@@ -1,5 +1,6 @@
-const { Client } = require('whatsapp-web.js');
+const { Client , MessageMedia , Location } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
+const imageToBase64 = require('image-to-base64');
 const client = new Client();
 
 
@@ -41,15 +42,15 @@ client.initialize();
 
 function sendMessage(mobile,message){
 
+    let chatId;
+
     // we have to delete "+" from the beginning and add "@c.us" at the end of the number.
     if( isNaN(parseInt(mobile[0])) ){
-        mobile = "91" + mobile +  "@c.us";
+         chatId = mobile.slice(1) +  "@c.us"; // chatID is used for sending messages
     }else{
-        mobile = mobile + "@c.us";
+         chatId = mobile + "@c.us";
     }
     console.log("sendMessage(",mobile,message,")");
-
-    let chatId = mobile;   // chatID is used for sending messages
     
     return new Promise((resolve,reject)=>{
          // Sending message.
@@ -64,6 +65,68 @@ function sendMessage(mobile,message){
     });
 }
 
+function sendLocation(mobile,lat,long,desc){
+
+    // we have to delete "+" from the beginning and add "@c.us" at the end of the number.
+    if( isNaN(parseInt(mobile[0])) ){
+        mobile = mobile.slice(1) +  "@c.us";
+    }else{
+        mobile = mobile + "@c.us";
+    }
+    console.log("sendMessage(",mobile,lat,long,desc,")");
+
+    let chatId = mobile;   // chatID is used for sending messages
+
+    var location = new Location(lat, long, desc);
+    
+    return new Promise((resolve,reject)=>{
+         // Sending message.
+        client.isRegisteredUser(chatId).then(function(isRegistered) {
+            if(isRegistered) {
+                client.sendMessage(chatId, location);
+                resolve(" Sent ");
+            }else{
+                reject(" Not a registered User !!");
+            }
+        });  
+    });
+}
+
+
+async function sendImage(mobile, url, caption){
+
+     // we have to delete "+" from the beginning and add "@c.us" at the end of the number.
+    if( isNaN(parseInt(mobile[0])) ){
+        mobile = mobile.slice(1) +  "@c.us";
+    }else{
+        mobile = mobile + "@c.us";
+    }
+    
+    console.log("sendMedia(",mobile,url,caption,")");
+
+    let chatId = mobile;   // chatID is used for sending messages
+    
+    return new Promise((resolve,reject)=>{
+
+        imageToBase64(url) // convert image to Base64 string
+        .then( async (response2) => {
+            const media = new MessageMedia('image/jpeg', response2);
+            await client.isRegisteredUser(chatId).then(function(isRegistered) {
+                if(isRegistered) {
+                    client.sendMessage(chatId, media, {caption});
+                    resolve(" Sent ");
+                } else {
+                    reject(" Not a registered User !!");
+                }
+            })
+         })
+         .catch((err)=>{
+             console.log("error",err);
+             reject(" Error ");
+         })
+    });
+
+}
 
 
 function getQRcode(){
@@ -75,5 +138,7 @@ function getClientStatus(){
 }
 
 module.exports['sendMessage']     = sendMessage;
+module.exports['sendLocation']    = sendLocation;
+module.exports['sendImage']       = sendImage;
 module.exports['getQRcode']       = getQRcode;
 module.exports['getClientStatus'] = getClientStatus;

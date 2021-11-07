@@ -5,7 +5,7 @@
 
 @HOST = 165.22.218.192
 @PORT = 4006
-@TO  = 9372220540
+@TO  = "+919137246088"
 
 
 ### Check if API is working 
@@ -28,8 +28,32 @@ accept: *
 content-type: application/json
 
 {
-    "phone": {{TO}},
-    "message": "HEY, JUST CHECKING ROUTE ASAP!"
+    "phone"    : {{TO}},
+    "message"  : "HEY, JUST CHECKING ROUTE ASAP!"
+}
+
+
+###Send Image with URL
+POST http://{{HOST}}:{{PORT}}/api/send/image HTTP/1.1
+accept: * 
+content-type: application/json
+
+{
+    "phone"     : {{TO}},
+    "url"       : "https://picsum.photos/200/300",
+    "caption"   : "New Image"
+}
+
+###Send Location
+POST http://{{HOST}}:{{PORT}}/api/send/location HTTP/1.1
+accept: * 
+content-type: application/json
+
+{
+    "phone"       : {{TO}},
+    "latitude"    : 19.009340,
+    "longitude"   : 72.830566,
+    "description" : "New Location"
 }
 
 
