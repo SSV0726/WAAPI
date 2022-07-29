@@ -3,57 +3,89 @@
 #              API - ROUTES             #
 #########################################
 
-@HOST = 165.22.218.192
-@PORT = 4006
-@TO  = "+919137246088"
+@PORT = 5002
+@TO  = "+918459953212"
 
 
 ### Check if API is working 
-GET http://{{HOST}}:{{PORT}}/api HTTP/1.1
-
-### Get QR-CODE to login 
-GET http://{{HOST}}:{{PORT}}/api/qrcode HTTP/1.1
-accept: * 
-content-type: application/json
+GET http://localhost:{{PORT}} HTTP/1.1
 
 ### Check Client status if its logged in or not
-GET http://{{HOST}}:{{PORT}}/api/whatsapp/status HTTP/1.1
+GET http://localhost:{{PORT}}/api/whatsapp/status HTTP/1.1
 accept: * 
 content-type: application/json
 
+### search client messages with request query as query while the limit and page is optional
+GET http://localhost:{{PORT}}/api/messages?query="howfa" HTTP/1.1
+accept: * 
+content-type: application/json
 
-###Send Message
-POST http://{{HOST}}:{{PORT}}/api/send/message HTTP/1.1
+### check common groups between a client and contact (response not what is expected)
+GET http://localhost:{{PORT}}/api/groups/+2348105463507 HTTP/1.1
+accept: * 
+content-type: application/json
+
+###Send Message to a contact
+POST http://localhost:{{PORT}}/api/send/message HTTP/1.1
 accept: * 
 content-type: application/json
 
 {
     "phone"    : {{TO}},
-    "message"  : "HEY, JUST CHECKING ROUTE ASAP!"
+    "subject"  : " SOME subject "
+    "message"  : "Some Test Message "
 }
 
-
-###Send Image with URL
-POST http://{{HOST}}:{{PORT}}/api/send/image HTTP/1.1
+###Send location to a contact
+POST http://localhost:{{PORT}}/api/send/location HTTP/1.1
 accept: * 
 content-type: application/json
 
 {
-    "phone"     : {{TO}},
-    "url"       : "https://picsum.photos/200/300",
-    "caption"   : "New Image"
+    "phone"    : {{TO}},
+    "latitude": 67,
+    "longtitude":80,
+    "description":"this is it"
 }
-
-###Send Location
-POST http://{{HOST}}:{{PORT}}/api/send/location HTTP/1.1
+###Send Image to a contact
+POST http://localhost:{{PORT}}/api/send/image HTTP/1.1
 accept: * 
 content-type: application/json
 
 {
-    "phone"       : {{TO}},
-    "latitude"    : 19.009340,
-    "longitude"   : 72.830566,
-    "description" : "New Location"
+    "phone"    : {{TO}},
+    "mediaUrl": "https://via.placeholder.com/350x150.png",
+    "caption":"this is it"
 }
 
+###Change Clients profile status
+POST http://localhost:{{PORT}}/api/set/status HTTP/1.1
+accept: * 
+content-type: application/json
+
+{
+    "status"    : "On it!!" 
+}
+
+###Change clients display name 
+POST http://localhost:{{PORT}}/api/change/displayname HTTP/1.1
+accept: * 
+content-type: application/json
+
+{
+    "displayName"    : "GH`ded" 
+}
+###Create group(not working)
+POST http://localhost:{{PORT}}/api/create/group HTTP/1.1
+accept: * 
+content-type: application/json
+
+{
+    "title"    : "my bot group", 
+    "participants":[{{TO}}] 
+}
+### Client Logout
+GET http://localhost:{{PORT}}/api/logout HTTP/1.1
+accept: * 
+content-type: application/json
 
