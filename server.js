@@ -15,16 +15,21 @@ app.use(cors());
 
 let clientStatus= false;
 
-
 const client = new Client({
-  authStrategy: new LocalAuth()
+  authStrategy: new LocalAuth(),
+  args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox' 
+  ],
+  puppeteer: { headless: true}
 });
 
 client.initialize();
 
 //##################################################//
-//                    Functions                        //
+//                    Functions                     //
 //##################################################//
+
 function convertTochatId(mobile){
   if( isNaN(parseInt(mobile[0])) ){
     chatId = mobile.slice(1) +  "@c.us"; // chatID is used for sending messages
@@ -34,6 +39,7 @@ function convertTochatId(mobile){
   // console.log({chatId})
   return chatId
 }
+
 async function checkUser(mobile){
   let chatId;
   chatId= convertTochatId(mobile)
@@ -47,10 +53,11 @@ async function checkUser(mobile){
   // console.log(validClient)
   return chatId
 }
+
 async function sendMessage(mobile,message){
   console.log("sendMessage(",mobile,message,")");
-  const recipient= await checkUser(mobile)
-  const msg= await client.sendMessage(recipient, message)
+  const recipient = await checkUser(mobile)
+  const msg     = await client.sendMessage(recipient, message)
   return msg
   // return new Promise((resolve,reject)=>{
   //     client.isRegisteredUser(chatId).then(function(isRegistered) {
@@ -63,6 +70,7 @@ async function sendMessage(mobile,message){
   //     });  
   // });
 }
+
 async function sendMedia(mobile,urltoMedia,caption){
   console.log("sendMedia(",mobile,urltoMedia, caption,")");
   const recipient= await checkUser(mobile)
@@ -70,6 +78,7 @@ async function sendMedia(mobile,urltoMedia,caption){
   const msg= await client.sendMessage(recipient,media,{caption});
   return msg
 }
+
 async function sendLocation(mobile,lat,long,desc){
   console.log("sendLocation(",mobile,lat,long,desc,")");
   const recipient= await checkUser(mobile)
@@ -77,6 +86,7 @@ async function sendLocation(mobile,lat,long,desc){
   const msg= await client.sendMessage(recipient,location);
   return msg
 }
+
 async function createGroup(title, participants=[]){
   let b=await client.getContactById(convertTochatId(participants[0]))
   console.log({b})
@@ -85,6 +95,7 @@ async function createGroup(title, participants=[]){
   const group=await client.createGroup(title,[convertTochatId(participants[0])])
   return group
 }
+
 async function getCommonGroups(mobile){
   const contactId= convertTochatId(mobile)
   const contact= await client.getContactById(contactId)
@@ -93,15 +104,11 @@ async function getCommonGroups(mobile){
   return commongroups
 }
 
+
 //##################################################//
-//                    Routes                        //
+//                  Automation                      //
 //##################################################//
-app.get("/", (req, res) => {
-  res.json({
-    status  : "success",
-    message : "API is working !!",
-  });
-});
+
 
 client.on('qr', qr => {
   console.log('QR RECEIVED', qr);
@@ -129,49 +136,33 @@ client.on('disconnected', ()=>{
   console.log('client is disconnected')
   clientStatus=false
 })
-function numberGuessFunc(msg, numberGuessed){
-  if(numberGuessed.length ==0){
-    return 5
-  }
-  let prevNumber=numberGuessed.shift()
-  let num1to10=[...Array(10).keys()].map(n=>n+1)
-  let remainingNums= num1to10.filter(n=>numberGuessed.indexOf(n)==-1)
-  let lesserNums=remainingNums.filter(n<prevNumber)
-  let higherNums=remainingNums.filter(n>prevNumber)
-  return msg=='lower'?lesserNums[Math.floor(Math.random()* lesserNums.length)]:higherNums[Math.floor(Math.random()* higherNums.length)] 
-}
-client.on('message', async (message) => {
-    console.log(message.from , " : " , message.body ); 
-    let count=0
-    if (message.body.toLowerCase()=='senior man'){
-        count++
-        await message.reply('Thanks for your messages, I will reply when I am not a bot 😃. In the meantime, think of a number between 1-10')
-    }
-    if(count && message.body.toLowerCase=="ok I have done so gee"){
-      let tirednessLevel=4
-      let numbersGuessed=[]
-      
-      while( tirednessLevel && message.body.toLowerCase!=="yes that is it"){
-        let msg=message.body.toLowerCase
-        if(!['higher','lower'].includes(msg)){
-          await client.sendMessage('Invalid response, can we please go back to the game?')
-        }
-        else{
-          let newNumber=numberGuessFunc(msg,numbersGuessed)
-          await client.sendMessage(message.from, 'it should be '+newNumber)
-          numbersGuessed.unshift()
-          tirednessLevel--
-        }
 
-      }
-      if(!tirednessLevel){
-        await client.sendMessage(message.from, "I am out of guesses")
-        count=0  
-      }
-      await client.sendMessage(message.from, "Nice knowing")
-      count=0
+
+client.on('message', async (message) => {
+
+    console.log(message.from , " : " , message.body ); 
+    if (message.body.toLowerCase()=='!button'){
+        await message.reply('Thanks for your messages, I am not a bot 😃. ')
+        // client.sendMessage(to, new Buttons('Body text/ MessageMedia instance', [{id:'customId',body:'button1'},{body:'button2'},{body:'button3'},{body:'button4'}], 'Title here, doesn\'t work with media', 'Footer here'), {caption: 'if you used a MessageMedia instance, use the caption here'});
+        // client.sendMessage(to, new List('Body text/ MessageMedia instance', 'List message button text', [{title: 'sectionTitle', rows: [{id: 'customId', title: 'ListItem2', description: 'desc'}, {title: 'ListItem2'}]}], 'Title here, doeswork with media', 'Footer here'), {caption: 'if you used a MessageMedia instance, use the caption here'})
+
+    }else{
+      await message.reply('Thanks for your messages, I am not a bot 😃. ')
     }
 });
+
+
+//##################################################//
+//                    Routes                        //
+//##################################################//
+
+app.get("/", (req, res) => {
+  res.json({
+    status  : "success",
+    message : "API is working !!",
+  });
+});
+
 app.get('/api/whatsapp/status', async(req,res)=>{
   return res.json({
     online:clientStatus
@@ -217,7 +208,7 @@ app.post('/api/send/location',async(req,res)=> {
     });
   }
 });
-//send image (apparently working)
+
 app.post('/api/send/image', async(req,res)=> {
   try { 
     console.log("Body",req.body);
@@ -252,6 +243,7 @@ app.post('/api/create/group', async(req,res)=> {
     });
   }
 });
+
 //set display name (not succesfull)
 app.post('/api/change/displayname', async(req,res)=> {
   try { 
@@ -269,6 +261,7 @@ app.post('/api/change/displayname', async(req,res)=> {
     });
   }
 });
+
 //set status (working)
 app.post('/api/set/status', async(req,res)=> {
   try { 
@@ -306,6 +299,7 @@ app.get('/api/groups/:mobile', async(req,res)=> {
     });
   }
 });
+
 //search messages(query,options{page, limit}) (working)
 app.get('/api/messages', async(req,res)=> {
   try { 
@@ -349,7 +343,8 @@ app.get('/api/logout', async(req,res)=> {
 //##################################################//
 //                    SERVER                        //
 //##################################################//
-const PORT = process.env.PORT || 5002;
+const PORT = process.env.PORT || 9999;
+
 app.listen(PORT, (err) => {
   if (err) {
     console.error(`ERROR While Starting Server : ${err}`);
