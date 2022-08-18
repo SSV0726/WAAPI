@@ -32,7 +32,7 @@ content-type: application/json
 
 {
     "phone"    : {{TO}},
-    "subject"  : " SOME subject "
+    "subject"  : "SOME subject",
     "message"  : "Some Test Message "
 }
 
@@ -53,9 +53,9 @@ accept: *
 content-type: application/json
 
 {
-    "phone"    : {{TO}},
-    "mediaUrl": "https://via.placeholder.com/350x150.png",
-    "caption":"this is it"
+    "phone"   : {{TO}},
+    "mediaUrl": "https://public-bucket-485599661377.s3.ap-south-1.amazonaws.com/finalWelcome.png",
+    "caption" : "this is it"
 }
 
 ###Change Clients profile status

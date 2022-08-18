@@ -59,22 +59,12 @@ async function sendMessage(mobile,message){
   const recipient = await checkUser(mobile)
   const msg     = await client.sendMessage(recipient, message)
   return msg
-  // return new Promise((resolve,reject)=>{
-  //     client.isRegisteredUser(chatId).then(function(isRegistered) {
-  //         if(isRegistered) {
-  //             const msg=client.sendMessage(chatId, message);
-  //             resolve(" Sent ");
-  //         }else{
-  //             reject(" Not a registered User !!");
-  //         }
-  //     });  
-  // });
 }
 
-async function sendMedia(mobile,urltoMedia,caption){
-  console.log("sendMedia(",mobile,urltoMedia, caption,")");
+async function sendMedia(mobile, imageUrl, caption){
+  console.log("sendMedia(",mobile,imageUrl, caption,")");
   const recipient= await checkUser(mobile)
-  const media = await MessageMedia.fromUrl('https://via.placeholder.com/350x150.png');
+  const media = await MessageMedia.fromUrl(imageUrl);
   const msg= await client.sendMessage(recipient,media,{caption});
   return msg
 }
@@ -141,13 +131,10 @@ client.on('disconnected', ()=>{
 client.on('message', async (message) => {
 
     console.log(message.from , " : " , message.body ); 
-    if (message.body.toLowerCase()=='!button'){
-        await message.reply('Thanks for your messages, I am not a bot 😃. ')
-        // client.sendMessage(to, new Buttons('Body text/ MessageMedia instance', [{id:'customId',body:'button1'},{body:'button2'},{body:'button3'},{body:'button4'}], 'Title here, doesn\'t work with media', 'Footer here'), {caption: 'if you used a MessageMedia instance, use the caption here'});
-        // client.sendMessage(to, new List('Body text/ MessageMedia instance', 'List message button text', [{title: 'sectionTitle', rows: [{id: 'customId', title: 'ListItem2', description: 'desc'}, {title: 'ListItem2'}]}], 'Title here, doeswork with media', 'Footer here'), {caption: 'if you used a MessageMedia instance, use the caption here'})
-
-    }else{
-      await message.reply('Thanks for your messages, I am not a bot 😃. ')
+    if (message.body.toLowerCase() == 'hi'){
+        await message.reply('Thanks for your messages.\nHow can we help you 😃. ')
+        await client.sendMessage(to, new Buttons('Body text/ MessageMedia instance', [{id:'customId',body:'button1'},{body:'button2'},{body:'button3'},{body:'button4'}], 'Title here, doesn\'t work with media', 'Footer here'), {caption: 'if you used a MessageMedia instance, use the caption here'});
+        await client.sendMessage(to, new List('Body text/ MessageMedia instance', 'List message button text', [{title: 'sectionTitle', rows: [{id: 'customId', title: 'ListItem2', description: 'desc'}, {title: 'ListItem2'}]}], 'Title here, doeswork with media', 'Footer here'), {caption: 'if you used a MessageMedia instance, use the caption here'});
     }
 });
 
@@ -212,7 +199,7 @@ app.post('/api/send/location',async(req,res)=> {
 app.post('/api/send/image', async(req,res)=> {
   try { 
     console.log("Body",req.body);
-    const media=await sendMedia(req.body.phone,req.body.mediaUrl ,req.body.caption);
+    const media = await sendMedia(req.body.phone, req.body.mediaUrl ,req.body.caption);
     return res.json({
       status:'successful',
       media
@@ -343,7 +330,7 @@ app.get('/api/logout', async(req,res)=> {
 //##################################################//
 //                    SERVER                        //
 //##################################################//
-const PORT = process.env.PORT || 9999;
+const PORT = process.env.PORT || 5002;
 
 app.listen(PORT, (err) => {
   if (err) {
