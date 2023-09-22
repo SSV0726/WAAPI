@@ -17,11 +17,10 @@ let clientStatus= false;
 
 const client = new Client({
   authStrategy: new LocalAuth(),
-  args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox' 
-  ],
-  puppeteer: { headless: true}
+  puppeteer: { 
+    headless: false,
+    args: [ '--no-sandbox', '--disable-setuid-sandbox' ]
+  }
 });
 
 client.initialize();
