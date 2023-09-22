@@ -18,7 +18,7 @@ let clientStatus= false;
 const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: { 
-    headless: false,
+    headless: true,
     args: [ '--no-sandbox', '--disable-setuid-sandbox' ]
   }
 });
@@ -110,6 +110,10 @@ client.on('qr', qr => {
   });
 });
 
+client.on('loading_screen', (percent, message) => {
+  console.log('LOADING SCREEN', percent, message);
+});
+
 client.on('ready', () => {
   console.log('READY OR NOT, HERE I COME!');
   clientStatus= true
@@ -159,7 +163,7 @@ app.post('/api/send/message',async(req,res)=> {
   try { 
     console.log("Body shou",req.body);
 
-    let msgBody = "*" + req.body.subject + "* \n \n " + req.body.message + ".";
+    let msgBody = "*" + req.body.subject + "* \n\n" + req.body.message;
 
     const message =await sendMessage(req.body.phone,msgBody);
     return res.json({

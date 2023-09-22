@@ -33,7 +33,7 @@ content-type: application/json
 {
     "phone"    : {{TO}},
     "subject"  : "SOME subject",
-    "message"  : "Some Test Message "
+    "message"  : "Some Test Message . "
 }
 
 ###Send location to a contact

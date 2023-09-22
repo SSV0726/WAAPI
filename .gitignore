@@ -1,6 +1,7 @@
 
 .wwebjs_auth
 .wwebjs_auth/
+.wwebjs_cache 
 
 *.log
 npm-debug.log*
